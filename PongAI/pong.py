@@ -15,8 +15,6 @@ control2 = random.choice(population2)
 view = 0
 mode = 0
 allow = 0
-kill = 0
-kill2 = 0
 
 # Initializing Pygame - Basically getting it ready
 pygame.init()
