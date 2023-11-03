@@ -269,10 +269,8 @@ while True:
             # Randomize Kill Switch
             if event.key == pygame.K_k:
                 population = ai.create_population(50, 5, 3, 0, 0)
-                gen = 0
             if event.key == pygame.K_l:
                 population2 = ai.create_population(50, 5, 3, 0, 0)
-                gen2 = 0
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w or event.key == pygame.K_s:
                 paddle_speed = 0
