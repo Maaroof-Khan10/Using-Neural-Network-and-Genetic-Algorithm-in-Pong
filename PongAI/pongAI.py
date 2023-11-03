@@ -16,11 +16,11 @@ class AI(object):
         net.append(output_layer)
         return net
 
-    # Activation in case you wanna use it
+    # Activation in case
     def sigmoid(self, x):
         return 1/(1 + np.exp(-x))
 
-    # Running our basic network
+    # Running basic network
     def run_base_net(self, network, data):
         if network[0] == len(data):
             weighed = []
@@ -38,7 +38,7 @@ class AI(object):
                 for j in range(len(weighed)):
                     result += weighed[j][i]
                 result += biases[i]
-                # Sigmoid in this case was not working well so I commented it - You can use it or any other activation if you want
+                # Sigmoid was not working well in this scenario
                 #result = self.sigmoid(result)
                 results.append(result)
             return results
@@ -66,7 +66,7 @@ class AI(object):
                 network.append(self.base_net(network_height, output_layer))
                 return network
 
-    # Running our complex network
+    # Running complex network
     def run_network(self, network, data):
         results = []
         for net in network:
@@ -81,7 +81,7 @@ class AI(object):
             population.append(self.create_network(input_layer, output_layer, width, height))
         return population
 
-    # Crossing them to get new child - Can customize this function
+    # Crossing them to get new child
     def cross_mating(self, pool, size, new):
         new_population = []
         for network in pool:
@@ -132,7 +132,7 @@ class AI(object):
             new_population.append(network)
         return new_population
 
-    # Mutating the babies
+    # Mutating the offspring
     def mutate(self, population, rate):
         for i in range(rate):
             mutation = np.random.random_sample()

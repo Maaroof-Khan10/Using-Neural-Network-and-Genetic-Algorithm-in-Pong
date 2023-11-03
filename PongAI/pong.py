@@ -1,5 +1,4 @@
 import pygame, sys, random
-import numpy as np
 from pongAI import AI
 import json
 
@@ -10,27 +9,31 @@ population = ai.create_population(50, 5, 3, 0, 0)
 # Population for players on right side - Size: 50, Inputs: 5, Outputs: 3, Hidden_layer_width: 0, Hidden_layer_height: 0
 population2 = ai.create_population(50, 5, 3, 0, 0)
 
+# Choosing networks which control the Paddle
 control = random.choice(population)
 control2 = random.choice(population2)
+
+# Different flags to change game mode and other settings
 view = 0
 mode = 0
 allow = 0
 
-# Initializing Pygame - Basically getting it ready
+# Initializing Pygame
 pygame.init()
 clock = pygame.time.Clock()
 
-# Screen size - Can be changed
+# Screen size
 screen_height = 500
 screen_width = 1000
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Pong AI")
 
 # ball, paddle1 for right side - Population: 50, paddle2 for right side - Population: 50
+# paddleAI - For the right paddle (AI Controlled), paddleU - For user-controlled paddle
 ball = pygame.Rect(screen_width/2 - 10, screen_height/2 - 10, 20, 20)
-paddle1 = []
 paddleAI = pygame.Rect(screen_width - 20, random.randint(0, screen_height), 10, 120)
 paddleU = pygame.Rect(10, random.randint(0, screen_height), 10, 120)
+paddle1 = []
 for i in range(50):
     paddle1.append(pygame.Rect(screen_width - 20, random.randint(0, screen_height), 10, 120))
 paddle2 = []
@@ -42,7 +45,7 @@ background = pygame.Color("black")
 light_grey = (200, 200, 200)
 grey = (120, 120, 120)
 
-# Speed of our ball
+# Ball Speed
 ball_speed_x, ball_speed_y = 7 * random.choice((1, -1)), 7 * random.choice((1, -1))
 
 # Scores
@@ -53,7 +56,7 @@ paddle2_score = 0
 game_font = pygame.font.Font("freesansbold.ttf", 22)
 
 def ball_animation():
-    # getting the global stuff
+    # Global Variables
     global ball_speed_x, ball_speed_y, paddle1_score, paddle2_score
     # Add the speed to ball's position to move it
     ball.x += ball_speed_x
@@ -70,7 +73,7 @@ def ball_animation():
         ball_speed_x *= -1
 
 def paddle1_animation(paddle):
-    # Globals Again
+    # Global Variables
     global ball_speed_x, ball_speed_y
     # Checking if paddle collided with the walls - If yes stop
     if paddle.top <= 0:
@@ -78,6 +81,7 @@ def paddle1_animation(paddle):
     if paddle.bottom >= screen_height:
         paddle.bottom = screen_height
 
+    # Check if AI mode (Allow Collisions) is on
     # Checking if ball collided with the paddle - If yes change direction
     if mode == 1 and allow == 1:
         if ball.colliderect(paddle) and ball_speed_x > 0:
@@ -89,7 +93,7 @@ def paddle1_animation(paddle):
                 ball_speed_y *= -1
 
 def paddleAI_animation(paddle):
-    # Globals Again
+    # Global Variables
     global ball_speed_x, ball_speed_y
     # Checking if paddle collided with the walls - If yes stop
     if paddle.top <= 0:
@@ -143,7 +147,10 @@ def paddleU_animation(paddle):
 gen = 0
 gen2 = 0
 
+#Speed of User-Controlled Paddle
 paddle_speed = 0
+
+# Emergancy Flags
 emFlag = 1
 emFlag2 = 1
 
@@ -159,7 +166,7 @@ safe2 = []
 safe_paddle = []
 safe_paddle2 = []
 
-# Fit Guys
+# Paddled Fit for next generation
 fit = []
 fit2 = []
 
@@ -236,7 +243,7 @@ while True:
             file.write(toSave)
             pygame.quit()
             sys.exit()
-        # In case you wanna control a paddle
+        # Controls for Paddle and other modes
         if event.type == pygame.KEYDOWN:
             if mode == 0:
                 if event.key == pygame.K_w:
@@ -248,6 +255,7 @@ while True:
                     view = 1
                 else:
                     view = 0
+            # Changing Game Modes
             if event.key == pygame.K_c:
                 if mode == 0:
                     mode = 1
@@ -258,6 +266,7 @@ while True:
                     allow = 1
                 else:
                     allow = 0
+            # Randomize Kill Switch
             if event.key == pygame.K_k:
                 population = ai.create_population(50, 5, 3, 0, 0)
                 gen = 0
@@ -268,7 +277,7 @@ while True:
             if event.key == pygame.K_w or event.key == pygame.K_s:
                 paddle_speed = 0
 
-    # Getting the animation done
+    # Animating objects
     ball_animation()
     for i in range(len(paddle1)):
         paddle1_animation(paddle1[i])
@@ -278,8 +287,9 @@ while True:
     paddleAI_animation(paddleAI)
     paddleU_animation(paddleU)
 
-    # Rendering the stuff we are doing
+    # Rendering
     screen.fill(background)
+    # Change the rendering with respect to 'view' & 'mode' flag
     if view == 1:
         for i in range(len(paddle1)):
             pygame.draw.rect(screen, grey, paddle1[i])
@@ -294,14 +304,15 @@ while True:
     # Displaying the scores, generations and alive population
     paddle1_text = game_font.render(f"{paddle1_score}", False, light_grey)
     paddle2_text = game_font.render(f"{paddle2_score}", False, light_grey)
-    gen_text = game_font.render(f"Gen: {gen}", False, light_grey)
-    alive_text = game_font.render(f"Alive: {len(population)}", False, light_grey)
+    if mode == 1:
+        gen_text = game_font.render(f"Gen: {gen}", False, light_grey)
+        alive_text = game_font.render(f"Alive: {len(population)}", False, light_grey)
+        screen.blit(gen_text, (250, 0))
+        screen.blit(alive_text, (250, 50))
     gen2_text = game_font.render(f"Gen: {gen2}", False, light_grey)
     alive2_text = game_font.render(f"Alive: {len(population2)}", False, light_grey)
     screen.blit(paddle1_text, (510, 240))
     screen.blit(paddle2_text, (470, 240))
-    screen.blit(gen_text, (250, 0))
-    screen.blit(alive_text, (250, 50))
     screen.blit(gen2_text, (600, 0))
     screen.blit(alive2_text, (600, 50))
 
